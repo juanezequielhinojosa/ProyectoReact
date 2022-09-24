@@ -1,24 +1,51 @@
-import logo from './logo.svg';
+
+import { useEffect, useState } from 'react';
 import './App.css';
+import Favorites from './components/Favorite/Favorites';
+import Palettes from './components/Palette/Palettes';
+import Tags from './components/Tag/Tags';
+import { getColorPalettes,getTags } from './service';
+import { FavoritesContext } from './context/FavoriteContext';
 
 function App() {
+  const[colorPalettes,setColorPalettes]=useState([]);
+  const[tags,setTags]=useState([]);
+  const[favorites,setFavorites]=useState([])
+  useEffect(()=>{
+    
+    getColorPalettes()
+     .then(data => {
+      setColorPalettes(data)
+      setFavorites((data)=>data.filter((palette)=>palette.liked))
+    })
+     .catch(err => console.log(err))
+     .catch(err => console.log(err))
+
+     getTags()
+      .then(data=>setTags(data))
+  },[])
+  console.log(colorPalettes);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+    <FavoritesContext.Provider value={{favorites,setFavorites}}>
+      <div className="App">
+      <header>
+        <h1>Colors palette project</h1>
       </header>
-    </div>
+      <div className='main-container'>
+        <Tags
+        tags={tags}
+        />
+        <Palettes
+        palettes={colorPalettes}
+        />
+        <Favorites
+        favorites={favorites}/>
+      </div>
+     </div> 
+    </FavoritesContext.Provider>
+    
+        
+    
   );
 }
 
